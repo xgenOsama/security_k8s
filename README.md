@@ -67,3 +67,21 @@ kubectl get nodes
 ```bash
 sudo kubeadm join 192.168.232.150:6443 --token p4c6xq.e0avahyuo110d8ls --discovery-token-ca-cert-hash sha256:3926349f436b66965b92c55f17dc0a7367ed72cf025f65a0a89295b6c4dec572 --node-name=worker1
 ```
+
+#### now you need to setup flannel  networking model
+in the master type
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+```
+
+#### then you need to build and push api , webapp image to your docker hub after build deploy this image to the cluster
+
+```bash
+docker build -t <docker_hub_id>/sec_webapp ./webapp_image/
+docker build -t <docker_hub_id>/sec_api ./api_image/
+docker login
+docker push <docker_hub_id>/sec_webapp
+docker push <docker_hub_id>/sec_api
+kubectl apply -f ./k8s_test_images
+```
