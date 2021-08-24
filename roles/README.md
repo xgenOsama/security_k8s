@@ -7,5 +7,7 @@
 
 #### To implement Role Based Access Control in k8s , we should understand
 
-* Subjects \n
+* Subjects
+<p>
 the subjects specify the users who want to access the k8s api
+</p>
