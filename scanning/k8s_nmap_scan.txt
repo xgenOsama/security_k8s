@@ -1,0 +1,57 @@
+# Nmap 7.80 scan initiated Tue Aug 24 21:59:31 2021 as: nmap -p- -sV -oA k8s_nmap_scan.txt 192.168.232.150,151
+Nmap scan report for 192.168.232.150
+Host is up (0.00085s latency).
+Not shown: 65528 closed ports
+PORT      STATE SERVICE           VERSION
+80/tcp    open  http              Apache httpd 2.4.48 ((Debian))
+2379/tcp  open  ssl/etcd-client?
+2380/tcp  open  ssl/etcd-server?
+6443/tcp  open  ssl/sun-sr-https?
+10250/tcp open  ssl/http          Golang net/http server (Go-IPFS json-rpc or InfluxDB API)
+10256/tcp open  http              Golang net/http server (Go-IPFS json-rpc or InfluxDB API)
+31447/tcp open  http              Apache httpd 2.4.48 ((Debian))
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port6443-TCP:V=7.80%T=SSL%I=7%D=8/24%Time=6125A41C%P=x86_64-pc-linux-gn
+SF:u%r(GenericLines,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Type
+SF::\x20text/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\n400\x2
+SF:0Bad\x20Request")%r(GetRequest,22F,"HTTP/1\.0\x20403\x20Forbidden\r\nAu
+SF:dit-Id:\x203e5ef212-ea31-4f67-b6e9-ce135b52f01e\r\nCache-Control:\x20no
+SF:-cache,\x20private\r\nContent-Type:\x20application/json\r\nX-Content-Ty
+SF:pe-Options:\x20nosniff\r\nX-Kubernetes-Pf-Flowschema-Uid:\x20e8079e0a-1
+SF:454-40b0-b324-d32283bfb2e7\r\nX-Kubernetes-Pf-Prioritylevel-Uid:\x2040b
+SF:9fd1a-2d75-4a2c-9707-32913131519c\r\nDate:\x20Wed,\x2025\x20Aug\x202021
+SF:\x2000:00:00\x20GMT\r\nContent-Length:\x20185\r\n\r\n{\"kind\":\"Status
+SF:\",\"apiVersion\":\"v1\",\"metadata\":{},\"status\":\"Failure\",\"messa
+SF:ge\":\"forbidden:\x20User\x20\\\"system:anonymous\\\"\x20cannot\x20get\
+SF:x20path\x20\\\"/\\\"\",\"reason\":\"Forbidden\",\"details\":{},\"code\"
+SF::403}\n")%r(HTTPOptions,233,"HTTP/1\.0\x20403\x20Forbidden\r\nAudit-Id:
+SF:\x20bd4a8d21-be15-491c-91f2-00513c4ffaf8\r\nCache-Control:\x20no-cache,
+SF:\x20private\r\nContent-Type:\x20application/json\r\nX-Content-Type-Opti
+SF:ons:\x20nosniff\r\nX-Kubernetes-Pf-Flowschema-Uid:\x20e8079e0a-1454-40b
+SF:0-b324-d32283bfb2e7\r\nX-Kubernetes-Pf-Prioritylevel-Uid:\x2040b9fd1a-2
+SF:d75-4a2c-9707-32913131519c\r\nDate:\x20Wed,\x2025\x20Aug\x202021\x2000:
+SF:00:00\x20GMT\r\nContent-Length:\x20189\r\n\r\n{\"kind\":\"Status\",\"ap
+SF:iVersion\":\"v1\",\"metadata\":{},\"status\":\"Failure\",\"message\":\"
+SF:forbidden:\x20User\x20\\\"system:anonymous\\\"\x20cannot\x20options\x20
+SF:path\x20\\\"/\\\"\",\"reason\":\"Forbidden\",\"details\":{},\"code\":40
+SF:3}\n")%r(RTSPRequest,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-
+SF:Type:\x20text/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\n40
+SF:0\x20Bad\x20Request")%r(Help,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\n
+SF:Content-Type:\x20text/plain;\x20charset=utf-8\r\nConnection:\x20close\r
+SF:\n\r\n400\x20Bad\x20Request")%r(SSLSessionReq,67,"HTTP/1\.1\x20400\x20B
+SF:ad\x20Request\r\nContent-Type:\x20text/plain;\x20charset=utf-8\r\nConne
+SF:ction:\x20close\r\n\r\n400\x20Bad\x20Request");
+MAC Address: 00:0C:29:C0:9C:B8 (VMware)
+
+Nmap scan report for 192.168.232.151
+Host is up (0.00067s latency).
+Not shown: 65531 closed ports
+PORT      STATE SERVICE  VERSION
+80/tcp    open  http     Apache httpd 2.4.48 ((Debian))
+10250/tcp open  ssl/http Golang net/http server (Go-IPFS json-rpc or InfluxDB API)
+10256/tcp open  http     Golang net/http server (Go-IPFS json-rpc or InfluxDB API)
+31447/tcp open  http     Apache httpd 2.4.48 ((Debian))
+MAC Address: 00:0C:29:C0:60:FD (VMware)
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Tue Aug 24 22:01:17 2021 -- 2 IP addresses (2 hosts up) scanned in 106.55 seconds
