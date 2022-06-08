@@ -85,3 +85,35 @@ docker push <docker_hub_id>/sec_webapp
 docker push <docker_hub_id>/sec_api
 kubectl apply -f ./k8s_test_images
 ```
+# url https://computingforgeeks.com/install-kubernetes-cluster-on-centos-with-kubeadm/
+
+```bash
+# Install packages
+sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+sudo yum install docker-ce docker-ce-cli containerd.io
+
+# Create required directories
+sudo mkdir /etc/docker
+sudo mkdir -p /etc/systemd/system/docker.service.d
+
+# Create daemon json config file
+sudo tee /etc/docker/daemon.json <<EOF
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2",
+  "storage-opts": [
+    "overlay2.override_kernel_check=true"
+  ]
+}
+EOF
+
+# Start and enable Services
+sudo systemctl daemon-reload 
+sudo systemctl restart docker
+sudo systemctl enable docker
+```
