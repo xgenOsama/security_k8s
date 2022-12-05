@@ -5,13 +5,16 @@ setup k8s cluster lab
 After setup both servers run this command to setup docker , k8s commands run this file as sudo
 
 ```bash
+#url https://computingforgeeks.com/install-kubernetes-cluster-ubuntu-jammy/
 #!/bin/bash
 apt update
 apt install docker.io
 systemctl enable docker
+sudo curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add
 apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
 apt -y update
+sudo apt-get update && sudo apt-get install -y apt-transport-https curl
 apt install -y kubeadm kubectl kubelet kubernetes-cni
 ```
 
