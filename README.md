@@ -5,7 +5,9 @@ setup k8s cluster lab
 After setup both servers run this command to setup docker , k8s commands run this file as sudo
 
 ```bash
-#url https://computingforgeeks.com/install-kubernetes-cluster-ubuntu-jammy/ , https://computingforgeeks.com/install-mirantis-cri-dockerd-as-docker-engine-shim-for-kubernetes/
+# url : https://computingforgeeks.com/install-kubernetes-cluster-ubuntu-jammy/ ,
+# url : https://computingforgeeks.com/install-mirantis-cri-dockerd-as-docker-engine-shim-for-kubernetes/
+# url : https://docs.docker.com/engine/install/ubuntu/
 #!/bin/bash
 apt update
 apt install docker.io
