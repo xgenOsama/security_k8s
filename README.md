@@ -247,6 +247,8 @@ mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 kubectl cluster-info
+sudo cat /var/lib/kubelet/kubeadm-flags.env # output
+# KUBELET_KUBEADM_ARGS="--container-runtime=remote --container-runtime-endpoint=/run/cri-dockerd.sock --pod-infra-container-image=k8s.gcr.io/pause:3.6"
 
 ```
 
