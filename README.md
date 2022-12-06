@@ -253,7 +253,7 @@ kubectl cluster-info
 
 ## worker node
 ```bash
-# same step plus
+# same steps instead of kubeadm init type join command
 kubeadm join 192.168.171.134:6443 --token kkquvw.vrc7rbzdci8683pd \
 	--discovery-token-ca-cert-hash sha256:1ab978241595343c83a1135b74915ba6bf52f3e85c6448764384b45fae025c1d \
   --cri-socket /run/cri-dockerd.sock
