@@ -90,7 +90,7 @@ docker push <docker_hub_id>/sec_webapp
 docker push <docker_hub_id>/sec_api
 kubectl apply -f ./k8s_test_images
 ```
-# url https://computingforgeeks.com/install-kubernetes-cluster-on-centos-with-kubeadm/
+# for centos or redhat url https://computingforgeeks.com/install-kubernetes-cluster-on-centos-with-kubeadm/
 
 ```bash
 # Install packages
@@ -122,3 +122,141 @@ sudo systemctl daemon-reload
 sudo systemctl restart docker
 sudo systemctl enable docker
 ```
+
+# for v1.25.4 k8s lets setup kubeadm in 2 servers ubuntu ARM64
+
+## master node
+1. install docker
+```bash
+# Add repo and Install packages
+sudo apt install -y  gnupg2 software-properties-common apt-transport-https ca-certificates curl lsb-release git wget
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update 
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+# Create required directories
+sudo mkdir -p /etc/systemd/system/docker.service.d
+
+# Create daemon json config file
+sudo tee /etc/docker/daemon.json <<EOF
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2"
+}
+EOF
+
+# Start and enable Services
+sudo systemctl daemon-reload 
+sudo systemctl restart docker
+sudo systemctl enable docker
+
+# Configure persistent loading of modules
+sudo tee /etc/modules-load.d/k8s.conf <<EOF
+overlay
+br_netfilter
+EOF
+
+# Ensure you load modules
+sudo modprobe overlay
+sudo modprobe br_netfilter
+
+# Set up required sysctl params
+sudo tee /etc/sysctl.d/kubernetes.conf<<EOF
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_forward = 1
+EOF
+########### For Docker Engine you need a shim interface. You can install Mirantis cri-dockerd as covered in the guide below #####
+# url : https://computingforgeeks.com/install-mirantis-cri-dockerd-as-docker-engine-shim-for-kubernetes/
+systemctl status docker
+VER=$(curl -s https://api.github.com/repos/Mirantis/cri-dockerd/releases/latest|grep tag_name | cut -d '"' -f 4|sed 's/v//g')
+echo $VER
+### For Intel 64-bit CPU ###
+wget https://github.com/Mirantis/cri-dockerd/releases/download/v${VER}/cri-dockerd-${VER}.amd64.tgz
+tar -xvf cri-dockerd-${VER}.amd64.tgz
+sudo mv cri-dockerd/cri-dockerd /usr/local/bin/
+### For ARM 64-bit CPU ###
+wget https://github.com/Mirantis/cri-dockerd/releases/download/v${VER}/cri-dockerd-${VER}.arm64.tgz
+tar -xvf cri-dockerd-${VER}.arm64.tgz
+sudo mv cri-dockerd/cri-dockerd /usr/local/bin/
+cri-dockerd --version
+wget https://raw.githubusercontent.com/Mirantis/cri-dockerd/master/packaging/systemd/cri-docker.service
+wget https://raw.githubusercontent.com/Mirantis/cri-dockerd/master/packaging/systemd/cri-docker.socket
+sudo mv cri-docker.socket cri-docker.service /etc/systemd/system/
+sudo sed -i -e 's,/usr/bin/cri-dockerd,/usr/local/bin/cri-dockerd,' /etc/systemd/system/cri-docker.service
+
+sudo systemctl daemon-reload
+sudo systemctl enable cri-docker.service
+sudo systemctl enable --now cri-docker.socket
+
+systemctl status cri-docker.socket
+# sudo kubeadm config images pull --cri-socket /run/cri-dockerd.sock
+```
+2. install Install kubelet, kubeadm and kubectl
+```bash
+sudo apt install curl apt-transport-https -y
+curl -fsSL  https://packages.cloud.google.com/apt/doc/apt-key.gpg|sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/k8s.gpg
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add
+sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+sudo apt update
+sudo apt install wget curl vim git kubelet kubeadm kubectl -y
+sudo apt-mark hold kubelet kubeadm kubectl
+kubectl version --client && kubeadm version
+```
+3. Disable Swap Space
+```bash
+sudo swapoff -a 
+# Check if swap has been disabled by running the free command.
+free -h
+# Now disable Linux swap space permanently in /etc/fstab. Search for a swap line and add # (hashtag) sign in front of the line.
+sudo vim /etc/fstab # output
+# /swapfile                                 none            swap    sw              0       0
+# Enable kernel modules
+sudo modprobe overlay
+sudo modprobe br_netfilter
+
+# Add some settings to sysctl
+sudo tee /etc/sysctl.d/kubernetes.conf<<EOF
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_forward = 1
+EOF
+
+# Reload sysctl
+sudo sysctl --system
+```
+
+4. Initialize control plane (run on first master node)
+```bash
+lsmod | grep br_netfilter
+sudo systemctl enable kubelet
+sudo kubeadm config images pull  --cri-socket /run/cri-dockerd.sock
+sudo kubeadm init  --pod-network-cidr=10.244.0.0/16  --cri-socket /run/cri-dockerd.sock
+# Runtime	Path to Unix domain socket
+# Docker	/run/cri-dockerd.sock
+# containerd	/run/containerd/containerd.sock
+# CRI-O	/var/run/crio/crio.sock
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+kubectl cluster-info
+
+```
+
+
+## worker node
+```bash
+# same step plus
+kubeadm join 192.168.171.134:6443 --token kkquvw.vrc7rbzdci8683pd \
+	--discovery-token-ca-cert-hash sha256:1ab978241595343c83a1135b74915ba6bf52f3e85c6448764384b45fae025c1d \
+  --cri-socket /run/cri-dockerd.sock
+```
+
+
